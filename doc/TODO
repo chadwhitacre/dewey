@@ -1,0 +1,36 @@
+0.1!
+==bumped==
+test!
+doc!
+batching?
+upper limit as well as lower?
+optimizations
+support multi-line collection strings
+===done===
+clean up imports
+is catalog.rids really necessary? yes, afaict
+CLI
+    ==bumped==
+    self.catalog.Resource.__dict__.keys() depends on Resource class definition
+        define Resource from code in ZODB?
+    daemonization/ZEO
+    saved collections
+    ===done===
+    factor to create your own
+fix multiple constraints logic
+look at DNF again -- we've got it; the only variance is starting groupings w/ NOT
+pretty up constraints cmd on cli
+clean startup/shutdown pattern
+indices
+    ==bumped==
+    dewey.indices.Boolean
+    datetime index: is, before, after, between
+    full-text indexing
+    ===done===
+    enumeration: is, in (useful for workflows)
+    more string searches: startswith, endswith, contains(?!)
+    Path could subclass String, eh?
+svn action for Resource -- not our job here
+CLI bug: parse/validate happens too late
+sort_on, sort_direction
+google code hosting

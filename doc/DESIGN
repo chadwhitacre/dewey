@@ -1,0 +1,31 @@
+import os
+import persistent
+
+import dewey
+
+
+class Resource(persistent.Persistent):
+    """Represent a filesystem resource.
+    """
+
+    path = '' # the path of the file we are representing
+    title = '' # the title of the resource, derived from its filename
+    state = '' # the workflow state of the resource
+
+    def __init__(self, path):
+        self.path = path
+
+        title = os.path.basename(path)
+        if title:
+            title = title.rsplit('.', 1)[0].replace('-', ' ').title()
+        self.title = title
+
+        state = title.lower()
+        self.state = state in ('foo', 'bar') and state or 'baz'
+
+
+def catalog_factory():
+    catalog = dewey.Catalog('./foo', Resource)
+    catalog.indices['title'] = dewey.indices.String()
+    catalog.indices['state'] = dewey.indices.Enumeration('foo', 'bar', 'baz')
+    return catalog

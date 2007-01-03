@@ -1,0 +1,69 @@
+"""This is an example dewey script.
+
+It defines a simple Resource and Catalog, and starts the CLI. Use the DEWEYROOT
+environment variable to specify the directory to index.
+
+"""
+import os
+from os.path import basename, getsize, isdir, isfile
+
+import dewey
+import dewey.cli
+import persistent
+
+
+try:
+    ROOT = os.environ['DEWEYROOT']
+except KeyError:
+    raise SystemExit("Please specify DEWEYROOT in the environment.")
+
+
+NODETYPES = ('directory', 'file', 'other')
+
+
+class Resource(persistent.Persistent):
+    """Represent a filesystem resource.
+    """
+
+    nodetype = '' # one of 'directory', 'file', 'other'
+    path = '' # the path of the file we are representing, absolute wrt DEWEYROOT
+    title = '' # the title of the resource, derived from its filename
+
+    size = 0 # the size of the file in bytes
+    readable = '' # True if the file is readable, False otherwise
+    writable = '' # True if the file is writable, False otherwise
+    executable = '' # True if the file is writable, False otherwise
+
+    def __init__(self, path):
+        self.path = path[len(ROOT):]
+        self.title = self._make_title(path)
+
+        self.readable = os.access(path, os.F_OK|os.R_OK)
+        self.writable = os.access(path, os.F_OK|os.W_OK)
+        self.executable = os.access(path, os.F_OK|os.X_OK)
+
+        nodetype = 'other'
+        if isfile(path):
+            nodetype = 'file'
+        elif isdir(path):
+            nodetype = 'directory'
+        self.nodetype = nodetype
+
+        self.size = getsize(path)
+
+
+    def _make_title(self, path):
+        filename = basename(path).rsplit('.', 1)[0]
+        return filename.replace('-', ' ').replace('_', ' ').title()
+
+
+def catalog_factory():
+    catalog = dewey.Catalog(ROOT, Resource)
+    catalog.indices['nodetype'] = dewey.indices.Enumeration(*NODETYPES)
+    catalog.indices['path'] = dewey.indices.Path(ROOT)
+    catalog.indices['title'] = dewey.indices.String()
+    return catalog
+
+
+if __name__ == '__main__':
+    dewey.cli.main(catalog_factory)

@@ -1,10 +1,9 @@
-0.1!
-==bumped==
+cli: print out time for crawl
 test!
 doc!
 batching?
 upper limit as well as lower?
-optimizations
+need some serious optimization for medium-to-large trees
 support multi-line collection strings
 ===done===
 clean up imports

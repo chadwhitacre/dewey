@@ -2,6 +2,7 @@ import fnmatch
 import os
 import random
 import stat
+import sys
 import time
 import threading
 import warnings
@@ -11,7 +12,7 @@ import persistent
 import transaction
 from BTrees.IIBTree import IITreeSet
 from BTrees.IOBTree import IOBTree
-from BTrees.OOBTree import OOBTree
+from BTrees.OOBTree import OOBTree, OOTreeSet
 
 
 MARKER = object()
@@ -128,12 +129,20 @@ class Catalog(persistent.Persistent):
         # =====================
 
         self._add_update(self.root)
+        i = 0
         for dirpath, dirs, files in os.walk(self.root):
             for name in (dirs + files):
                 path = join(dirpath, name)
                 if self.ignore(path):
                     continue
-                self._add_update(path)
+                try:
+                    self._add_update(path)
+                except OSError, exc:
+                    print >> sys.stderr, exc.args[0]
+                if (i % 20) == 0:
+                    print "committing transaction ..."
+                    transaction.commit()
+                i += 1
 
 
         # Remove non-existant files.
@@ -145,14 +154,14 @@ class Catalog(persistent.Persistent):
         # schedule than add/update (maybe every few seconds instead of
         # constantly?)
 
-        to_delete = []
+        to_delete = OOTreeSet()
         for path in self.ridtimes:
             if not exists(path):
                 print "unindexing " + path
                 rid = self.ridtimes[path][0]
                 for index in self.indices.values():
                     index.forget(rid)
-                to_delete.append(path) # avoid changing size during iteration
+                to_delete.insert(path)
                 del self.resources[rid] # {rid:resource} (one:one)
                 self.rids.remove(rid) # [rids] (seq)
         for path in to_delete:

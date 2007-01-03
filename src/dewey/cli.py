@@ -60,7 +60,7 @@ class CLI(cmd.Cmd):
         longest = 0
         for name, index in self.catalog.indices.iteritems():
             len_name = len(name)
-            longest = (len_name > 0) and len_name or longest
+            longest = (len_name > longest) and len_name or longest
             indices.append((name, getattr(index, '__name__', repr(index))))
         indices.sort()
         listing = []
@@ -116,7 +116,7 @@ class CLI(cmd.Cmd):
         try:
             self.collection = dewey.Collection(line)
         except (TypeError, ValueError), exc:
-            print exc.message
+            print exc.args[0]
             return
         self.update_collection()
 
@@ -175,7 +175,7 @@ class CLI(cmd.Cmd):
         try:
             constrain(constraint) # calls collection.parse/validate
         except (TypeError, ValueError), exc:
-            print exc.message # bad query
+            print exc.args[0] # bad query
             return
         self.update_collection()
 
@@ -286,7 +286,7 @@ class CLI(cmd.Cmd):
             try:
                 self.collection.limit = arg
             except (TypeError, ValueError), exc:
-                print exc.message
+                print exc.args[0]
             self.set_prompt()
 
 
@@ -339,7 +339,7 @@ class CLI(cmd.Cmd):
             try:
                 self.collection.sort = arg
             except (TypeError, ValueError), exc:
-                print exc.message
+                print exc.args[0]
             self.set_prompt()
 
 

@@ -1,0 +1,10 @@
+Dewey provides fast indexing and searching of your filesystem, so you can use it instead of an RDBMS. It's in the same box with:
+
+  - Google Desktop Search
+  - Spotlight
+  - WinFS
+  - Zope's ZCatalog
+
+Current status is alpha. We've implemented the basic API for instantiating a so-called 'catalog' with 'indices' of your own design. There are a couple indices implemented already (Enumeration, Path, String), and there is a basic sort/limit implementation. The command-line client is both an example for the library and a useful tool in it's own right.
+
+https://github.com/whit537/dewey/wiki/Quick-Start
